@@ -8,6 +8,7 @@ dependencies = [
     "datasets>=4.3.0",
     "ipykernel>=7.0.1",
     "matplotlib>=3.10.7",
+    "nbformat>=4.2.0",
     "numpy>=2.3.4",
     "plotly>=6.3.1",
     "tiktoken>=0.12.0",
