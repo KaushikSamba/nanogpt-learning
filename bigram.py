@@ -98,13 +98,23 @@ class BigramLanguageModel(nn.Module):
         # Cleanup: we're now adding a layer of indirection.
         # We have a latent space to transform the tokens into an embedding dimension.
         self.token_embedding_table = nn.Embedding(vocab_size, n_embd)
+
+        # For every position in the context, we want an encoding. This encoding can be added on to the token embedding.
+        self.position_embedding_table = nn.Embedding(block_size, n_embd)
+
         # A linear layer transforms these embeddings to obtain the logits corresponding to each item in the vocabulary.
         self.lm_head = nn.Linear(n_embd, vocab_size)
 
     def forward(self, idx, targets=None):
         # idx and targets are both (B,T) tensor of integers
+        B, T = idx.shape
+
         tok_emb = self.token_embedding_table(idx)  # Token embeddings (B,T,C)
-        logits = self.lm_head(tok_emb)  # (B, T, vocab_size)
+        pos_emb = self.position_embedding_table(
+            torch.arange(T, device=device)
+        )  # Positional embeddings (T, C)
+        x = tok_emb + pos_emb  # (B, T, C)
+        logits = self.lm_head(x)  # (B, T, vocab_size)
 
         if targets is None:
             loss = None
